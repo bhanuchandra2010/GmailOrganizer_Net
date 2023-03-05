@@ -1,9 +1,5 @@
 ﻿using GmailOrganizer.Models;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Gmail.v1;
-using Google.Apis.Gmail.v1.Data;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
+using GmailOrganizer.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -13,50 +9,30 @@ namespace GmailOrganizer.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        private GmailService _gmailService;
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IMailServices _mailServices;
+        public HomeController(ILogger<HomeController> logger, IMailServices mailServices)
         {
             _logger = logger;
+            _mailServices = mailServices;
         }
 
-        public async Task<IActionResult> Login()
+
+        public async Task<IActionResult> Index()
         {
-            string[] Scopes = { GmailService.Scope.MailGoogleCom };
-            UserCredential credential;
-            using (FileStream stream = new(
-                "./client_secret.json",
-                FileMode.Open,
-                FileAccess.Read
-            ))
-            {
-                string credPath = "token_Send";
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                             GoogleClientSecrets.FromStream(stream).Secrets,
-                              Scopes,
-                              "user",
-                              CancellationToken.None,
-                              new FileDataStore(credPath, true)).Result;
-                Console.WriteLine("Credential file saved to: " + credPath);
-            }
-            // Create Gmail API service.
-            _gmailService = new GmailService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "mycodebit",
-            });
-
-            ListMessagesResponse list = await _gmailService.Users.Messages.List("me").ExecuteAsync();
-
-            return Json(list);
+            List<MessageInfo> lstMessage = await _mailServices.getMails();
+            return View(lstMessage);
         }
 
-        public IActionResult Index()
+
+        public IActionResult Privacy()
         {
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpPost]
+        public async Task<IActionResult> Delete(string[] senders)
         {
+            await _mailServices.DeleteMessages(senders);
             return View();
         }
 

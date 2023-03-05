@@ -2,21 +2,45 @@
     ViewData["Title"] = "Home Page";
 }
 
+@model List<MessageInfo>
+
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
-<p><a asp-area="" asp-controller="Home" asp-action="Login">Login</a></p>
-
-<ul>
-    @if (Context.User.Identity.IsAuthenticated)
-    {
-        <li>
-            <a>Hello @User.Identity.Name</a>
-        </li>
-        <li>
-            <p><a asp-area="" asp-controller="Home" asp-action="Logout">Logout</a></p>
-        </li>
+<div>
+     @using (Html.BeginForm("Delete", "Home", FormMethod.Post))  
+                {  
+                    <button type="submit" value="Delete" class="btn btn-sm btn-danger rounded-0" onclick="return confirm('Are you sure?')"><i class="fa fa-trash-o"></i> Delete</button>  
+                    <br /><br />  
+    <table id="mailsTable">
+        <tr>
+            <th></th>
+            <th>Id</th>
+            <th>From</th>
+            <th>Subject</th>
+        </tr>
+        @foreach (var fruit in Model)
+        {
+           
+            <tr>
+                <td>
+                    <input  type="checkbox" name="senders" id="senders" value="@fruit.From" />
+                </td>
+                <td>
+                    <label for="@fruit.Id">@fruit.Id</label>
+                </td>
+                <td>
+                    <label for="@fruit.From">@fruit.From</label>
+                </td>
+                 <td>
+                    <label for="@fruit.Subject">@fruit.Subject</label>
+                </td>
+               
+            </tr>
+        }
+    </table>
+    <br />
     }
-</ul>
+</div>
