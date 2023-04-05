@@ -5,6 +5,8 @@ using Google.Apis.Gmail.v1;
 using Google.Apis.Gmail.v1.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace GmailOrganizer.Services
 {
@@ -60,14 +62,17 @@ namespace GmailOrganizer.Services
                     Console.WriteLine(messagePart.Id);
                     string From = messagePart.Payload.Headers.Where(p => p.Name == "From").First().Value;
                     string Subject = messagePart.Payload.Headers.Where(p => p.Name == "Subject").First().Value;
+                    string Date = messagePart.Payload.Headers.Where(p => p.Name == "Date").First().Value;
+                    Date = DateTime.ParseExact(Date, "ddd, dd MMM yyyy hh:mm:ss ", CultureInfo.CurrentCulture).ToString("F");
 
-                    messageInfos.Add(new MessageInfo() { Id = message.Id, From = From, To = "", Subject = Subject, IsSelected = false });
+
+                    messageInfos.Add(new MessageInfo() { Id = message.Id, From = From, Date = Date, To = "", Subject = Subject, IsSelected = false });
                 }
             }
             return messageInfos.DistinctBy(p => p.From).ToList();
         }
 
-        public async Task DeleteMessages(string[] senders)
+        public async Task<List<MessageInfo>> deleteMails(string[] senders)
         {
             BatchDeleteMessagesRequest deleteMessagesRequest = new BatchDeleteMessagesRequest();
             deleteMessagesRequest.Ids = new List<string>();
@@ -77,8 +82,10 @@ namespace GmailOrganizer.Services
                 messageInfos.Where(p => p.From.Equals(sender)).ToList()
                    .ForEach(p => deleteMessagesRequest.Ids.Add(p.Id));
                 var v = await _gmailService.Users.Messages.BatchDelete(deleteMessagesRequest, "me").ExecuteAsync();
+                messageInfos.RemoveAll(p => p.From.Equals(sender));
 
             }
+            return messageInfos.DistinctBy(p => p.From).ToList();
         }
 
     }

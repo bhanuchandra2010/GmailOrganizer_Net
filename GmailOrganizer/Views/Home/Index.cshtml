@@ -10,37 +10,44 @@
 </div>
 
 <div>
-     @using (Html.BeginForm("Delete", "Home", FormMethod.Post))  
-                {  
-                    <button type="submit" value="Delete" class="btn btn-sm btn-danger rounded-0" onclick="return confirm('Are you sure?')"><i class="fa fa-trash-o"></i> Delete</button>  
-                    <br /><br />  
-    <table id="mailsTable">
-        <tr>
-            <th></th>
-            <th>Id</th>
-            <th>From</th>
-            <th>Subject</th>
-        </tr>
-        @foreach (var fruit in Model)
-        {
-           
+    @using (Html.BeginForm("Delete", "Home", FormMethod.Post))
+    {
+        <button type="submit" value="Delete" class="btn btn-sm btn-danger rounded-0" onclick="return confirm('Are you sure?')"><i class="fa fa-trash-o"></i>Delete Selected</button>
+        <h3>Total Mails Count: @Model.Count</h3>
+        <br />
+
+        <br />
+        <table id="mailsTable">
             <tr>
-                <td>
-                    <input  type="checkbox" name="senders" id="senders" value="@fruit.From" />
-                </td>
-                <td>
-                    <label for="@fruit.Id">@fruit.Id</label>
-                </td>
-                <td>
-                    <label for="@fruit.From">@fruit.From</label>
-                </td>
-                 <td>
-                    <label for="@fruit.Subject">@fruit.Subject</label>
-                </td>
-               
+                <th></th>
+                <th>Id</th>
+                <th>Date</th>
+                <th>From</th>
+                <th>Subject</th>
             </tr>
-        }
-    </table>
-    <br />
+            @foreach (var fruit in Model)
+            {
+
+                <tr>
+                    <td>
+                        <input type="checkbox" name="senders" id="senders" value="@fruit.From" />
+                    </td>
+                    <td>
+                        <label for="@fruit.Id">@fruit.Id</label>
+                    </td>
+                    <td>
+                        <label for="@fruit.Date">@fruit.Date</label>
+                    </td>
+                    <td>
+                        <label for="@fruit.From">@fruit.From</label>
+                    </td>
+                    <td>
+                        <label for="@fruit.Subject">@fruit.Subject</label>
+                    </td>
+
+                </tr>
+            }
+        </table>
+        <br />
     }
 </div>

@@ -32,8 +32,9 @@ namespace GmailOrganizer.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string[] senders)
         {
-            await _mailServices.DeleteMessages(senders);
-            return View();
+            var message = await _mailServices.deleteMails(senders);
+
+            return View("~/Views/Home/Index.cshtml", message);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

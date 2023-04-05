@@ -7,6 +7,6 @@ namespace GmailOrganizer.Services
         // public bool Login();
         Task<List<MessageInfo>> getMails();
 
-        Task DeleteMessages(string[] senders);
+        Task<List<MessageInfo>> deleteMails(string[] senders);
     }
 }
