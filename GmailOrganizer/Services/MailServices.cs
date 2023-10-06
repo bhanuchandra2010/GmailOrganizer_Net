@@ -62,14 +62,25 @@ namespace GmailOrganizer.Services
                     Console.WriteLine(messagePart.Id);
                     string From = messagePart.Payload.Headers.Where(p => p.Name == "From").First().Value;
                     string Subject = messagePart.Payload.Headers.Where(p => p.Name == "Subject").First().Value;
-                    string Date = messagePart.Payload.Headers.Where(p => p.Name == "Date").First().Value;
-                    Date = DateTime.ParseExact(Date, "ddd, dd MMM yyyy hh:mm:ss ", CultureInfo.CurrentCulture).ToString("F");
+                    string Date = GetDate(messagePart.Payload.Headers.Where(p => p.Name == "Date").First().Value);
+                    string newDate = DateTime.ParseExact(Date, "d MMM yyyy HH:mm:ss", CultureInfo.GetCultureInfo("en-US")).ToString();
 
 
-                    messageInfos.Add(new MessageInfo() { Id = message.Id, From = From, Date = Date, To = "", Subject = Subject, IsSelected = false });
+                    messageInfos.Add(new MessageInfo() { Id = message.Id, From = From, Date = newDate, To = "", Subject = Subject, IsSelected = false });
                 }
             }
             return messageInfos.DistinctBy(p => p.From).ToList();
+        }
+
+        private static string GetDate(string messagePart)
+        {
+            if (messagePart.Contains(','))
+            {
+                messagePart = messagePart.Remove(0, 4).Trim();
+            }
+            messagePart =messagePart.Remove( messagePart.LastIndexOf(":")+3,messagePart.Length-( messagePart.LastIndexOf(":") + 3));
+          
+            return messagePart;
         }
 
         public async Task<List<MessageInfo>> deleteMails(string[] senders)
