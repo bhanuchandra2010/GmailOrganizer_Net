@@ -70,6 +70,20 @@ namespace GmailOrganizer.Services
                 }
             }
             return messageInfos.DistinctBy(p => p.From).ToList();
+
+            
+        }
+
+       private string GetDomain(string sender)
+        {
+
+            if (sender.Contains('<') && sender.Contains('>'))
+            {
+                int domainIndex = sender.LastIndexOf("@");
+                 sender = sender.Remove(0, domainIndex + 1).Replace(">", "");
+            }
+            return sender;
+
         }
 
         private static string GetDate(string messagePart)
@@ -89,8 +103,8 @@ namespace GmailOrganizer.Services
             deleteMessagesRequest.Ids = new List<string>();
             foreach (string sender in senders)
             {
-
-                messageInfos.Where(p => p.From.Equals(sender)).ToList()
+                string domainName= GetDomain(sender);
+                messageInfos.Where(p => p.From.Contains(domainName)).ToList()
                    .ForEach(p => deleteMessagesRequest.Ids.Add(p.Id));
                 var v = await _gmailService.Users.Messages.BatchDelete(deleteMessagesRequest, "me").ExecuteAsync();
                 messageInfos.RemoveAll(p => p.From.Equals(sender));
